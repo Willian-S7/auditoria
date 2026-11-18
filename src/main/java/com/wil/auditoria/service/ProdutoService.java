@@ -73,10 +73,12 @@ public class ProdutoService {
         Produto produto = buscarProduto(id);
         if (produto.isAtivo()){
             produto.setAtivo(false);
-        }
+        } else {
         produto.setAtivo(true);
+        }
         produtoRepository.save(produto);
         return toDTO(produto);
+        
     }
 
     public void deletarProduto(Long id){

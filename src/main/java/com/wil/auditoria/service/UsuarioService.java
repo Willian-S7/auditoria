@@ -60,10 +60,9 @@ public class UsuarioService {
 
     public UsuarioResponse statusUsuario(Long id) {
         Usuario usuario = buscarUsuario(id);
-        if (usuario.isAtivo()) {
-            usuario.setAtivo(false);
-        }
-        usuario.setAtivo(true);
+
+        usuario.setAtivo(!usuario.isAtivo());
+        
         usuarioRepository.save(usuario);
         return toDTO(usuario);
     }

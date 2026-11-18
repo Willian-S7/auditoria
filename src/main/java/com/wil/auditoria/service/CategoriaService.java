@@ -53,8 +53,9 @@ public class CategoriaService {
         Categoria categoria = buscarCategoria(id);
         if (categoria.isAtivo()) {
             categoria.setAtivo(false);
-        }
+        } else {
         categoria.setAtivo(true);
+        }
         categoriaRepository.save(categoria);
         return toDTO(categoria);
     }
