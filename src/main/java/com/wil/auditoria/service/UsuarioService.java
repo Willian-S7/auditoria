@@ -36,7 +36,7 @@ public class UsuarioService {
         return toDTO(usuario);
     }
 
-    public List<UsuarioResponse> listarUsuários() {
+    public List<UsuarioResponse> listarUsuarios() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream().map(usuario -> toDTO(usuario)).toList();
     }

@@ -2,7 +2,9 @@ package com.wil.auditoria.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.wil.auditoria.dto.request.ProdutoRequest;
 import com.wil.auditoria.dto.response.ProdutoResponse;
@@ -45,4 +47,40 @@ public class ProdutoService {
         return produtoRepository.findAll().stream().map(produto -> toDTO(produto)).toList();
     }
 
+    public Produto buscarProduto(Long id) {
+        return produtoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
+    }
+
+    public ProdutoResponse produtoResponsePorId(Long id) {
+        Produto produto = buscarProduto(id);
+        return toDTO(produto);
+    }
+
+    public ProdutoResponse alterarProduto(Long id, ProdutoRequest request) {
+        Produto produto = buscarProduto(id);
+        Categoria categoria = categoriaService.buscarCategoria(request.categoriaId());
+
+        produto.setNome(request.nome());
+        produto.setDescricao(request.descricao());
+        produto.setPreco(request.preco());
+        produto.setQtdEstoque(request.qtdEstoque());
+        produto.setCategoria(categoria);
+        produtoRepository.save(produto);
+        return toDTO(produto);
+    }
+
+    public ProdutoResponse statusProduto(Long id){
+        Produto produto = buscarProduto(id);
+        if (produto.isAtivo()){
+            produto.setAtivo(false);
+        }
+        produto.setAtivo(true);
+        produtoRepository.save(produto);
+        return toDTO(produto);
+    }
+
+    public void deletarProduto(Long id){
+        Produto produto = buscarProduto(id);
+        produtoRepository.delete(produto);
+    }
 }
