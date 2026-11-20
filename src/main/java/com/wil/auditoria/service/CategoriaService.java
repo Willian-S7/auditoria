@@ -11,13 +11,17 @@ import com.wil.auditoria.dto.response.CategoriaResponse;
 import com.wil.auditoria.model.Categoria;
 import com.wil.auditoria.repository.CategoriaRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service 
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+    private final ContextoAuditoriaService contextoAuditoriaService;
     
-    public CategoriaService (CategoriaRepository categoriaRepository) {
+    public CategoriaService (CategoriaRepository categoriaRepository, ContextoAuditoriaService contextoAuditoriaService) {
         this.categoriaRepository = categoriaRepository;
+        this.contextoAuditoriaService = contextoAuditoriaService;
     }
 
     public CategoriaResponse toDTO(Categoria categoria) {
@@ -26,12 +30,17 @@ public class CategoriaService {
         );
         return response;
     }
+    
+    @Transactional 
+    public CategoriaResponse novaCategoria(Long usuarioId, CategoriaRequest request) {
 
-    public CategoriaResponse novaCategoria(CategoriaRequest request) {
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+
         Categoria categoria = new Categoria();
         categoria.setNome(request.nome());
         categoria.setAtivo(true);
         categoriaRepository.save(categoria);
+        
         return toDTO(categoria);
     }
 
@@ -49,7 +58,11 @@ public class CategoriaService {
         return toDTO(categoria);
     }
 
-    public CategoriaResponse statusCategoria(Long id) {
+    @Transactional 
+    public CategoriaResponse statusCategoria(Long usuarioId, Long id) {
+
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+        
         Categoria categoria = buscarCategoria(id);
         if (categoria.isAtivo()) {
             categoria.setAtivo(false);
@@ -57,11 +70,17 @@ public class CategoriaService {
         categoria.setAtivo(true);
         }
         categoriaRepository.save(categoria);
+        
         return toDTO(categoria);
     }
 
-    public void deleteCategoria (Long id) {
+    @Transactional 
+    public void deleteCategoria (Long usuarioId, Long id) {
+        
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+
         Categoria categoria = buscarCategoria(id);
         categoriaRepository.delete(categoria);
+        
     }
 }

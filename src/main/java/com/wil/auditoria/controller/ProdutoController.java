@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +28,8 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoResponse> novoProduto (@RequestBody ProdutoRequest request) {
-        ProdutoResponse produto = produtoService.novoProduto(request);
+    public ResponseEntity<ProdutoResponse> novoProduto (@RequestHeader("X-usuario-Id")  Long usuarioId, @RequestBody ProdutoRequest request) {
+        ProdutoResponse produto = produtoService.novoProduto(usuarioId, request);
         return ResponseEntity.ok(produto);
     }
 
@@ -45,20 +46,20 @@ public class ProdutoController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<ProdutoResponse> alterarProduto (@PathVariable Long id, @RequestBody ProdutoRequest request) {
-        ProdutoResponse produto = produtoService.alterarProduto(id, request);
+    public ResponseEntity<ProdutoResponse> alterarProduto (@RequestHeader("X-usuario-Id")  Long usuarioId, @PathVariable Long id, @RequestBody ProdutoRequest request) {
+        ProdutoResponse produto = produtoService.alterarProduto(usuarioId, id, request);
         return ResponseEntity.ok(produto);
     }
 
     @PatchMapping ("/{id}")
-    public ResponseEntity<ProdutoResponse> AlterarStatusProduto(Long id) {
-        ProdutoResponse produto = produtoService.statusProduto(id);
+    public ResponseEntity<ProdutoResponse> AlterarStatusProduto(@RequestHeader("X-usuario-Id") Long usuarioId, Long id) {
+        ProdutoResponse produto = produtoService.statusProduto(usuarioId, id);
         return ResponseEntity.ok(produto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {
-        produtoService.deletarProduto(id);
+    public ResponseEntity<Void> deleteProduto(@RequestHeader("X-usuario-Id") Long usuarioId, @PathVariable Long id) {
+        produtoService.deletarProduto(usuarioId, id);
         return ResponseEntity.noContent().build();
     }
 }

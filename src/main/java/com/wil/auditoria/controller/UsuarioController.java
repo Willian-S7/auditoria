@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,8 +31,8 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponse> novoUsuario(@RequestBody @Valid UsuarioRequest request) {
-        UsuarioResponse usuario = usuarioService.novoUsuario(request);
+    public ResponseEntity<UsuarioResponse> novoUsuario(@RequestHeader("X-usuario-Id")  Long usuarioId, @RequestBody @Valid UsuarioRequest request) {
+        UsuarioResponse usuario = usuarioService.novoUsuario(usuarioId, request);
         return ResponseEntity.ok(usuario);
     }
 
@@ -48,20 +49,20 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> alterarUsuario(@PathVariable Long id,  @RequestBody UsuarioRequest request) {
-        UsuarioResponse usuario = usuarioService.alterarUsuario(id, request);
+    public ResponseEntity<UsuarioResponse> alterarUsuario(@RequestHeader("X-usuario-Id")  Long usuarioId, @PathVariable Long id,  @RequestBody UsuarioRequest request) {
+        UsuarioResponse usuario = usuarioService.alterarUsuario(usuarioId, id, request);
         return ResponseEntity.ok(usuario);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> alterarStatusUsuario(@PathVariable Long id) {
-        UsuarioResponse usuario = usuarioService.statusUsuario(id);
+    public ResponseEntity<UsuarioResponse> alterarStatusUsuario(@RequestHeader("X-usuario-Id")  Long usuarioId, @PathVariable Long id) {
+        UsuarioResponse usuario = usuarioService.statusUsuario(usuarioId, id);
         return ResponseEntity.ok(usuario);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
-        usuarioService.deleteUsuario(id);
+    public ResponseEntity<Void> deleteUsuario(@RequestHeader("X-usuario-Id")  Long usuarioId, @PathVariable Long id) {
+        usuarioService.deleteUsuario(usuarioId, id);
         return ResponseEntity.noContent().build();
     }
 }

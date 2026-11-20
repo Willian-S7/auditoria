@@ -12,15 +12,19 @@ import com.wil.auditoria.model.Categoria;
 import com.wil.auditoria.model.Produto;
 import com.wil.auditoria.repository.ProdutoRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service 
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final CategoriaService categoriaService;
+    private final ContextoAuditoriaService contextoAuditoriaService;
 
-    public ProdutoService (ProdutoRepository produtoRepository, CategoriaService categoriaService) {
+    public ProdutoService (ProdutoRepository produtoRepository, CategoriaService categoriaService, ContextoAuditoriaService contextoAuditoriaService) {
         this.produtoRepository = produtoRepository;
         this.categoriaService = categoriaService;
+        this.contextoAuditoriaService = contextoAuditoriaService;
     }
 
     public ProdutoResponse toDTO (Produto produto) {
@@ -28,7 +32,10 @@ public class ProdutoService {
         return response;
     }
 
-    public ProdutoResponse novoProduto(ProdutoRequest request) {
+    @Transactional 
+    public ProdutoResponse novoProduto(Long usuarioId, ProdutoRequest request) {
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+        
         Produto produto = new Produto();
         Categoria categoria = categoriaService.buscarCategoria(request.categoriaId());
 
@@ -40,6 +47,7 @@ public class ProdutoService {
         produto.setCategoria(categoria   
         );
         produtoRepository.save(produto);
+        
         return toDTO(produto);
     }
 
@@ -56,7 +64,11 @@ public class ProdutoService {
         return toDTO(produto);
     }
 
-    public ProdutoResponse alterarProduto(Long id, ProdutoRequest request) {
+    @Transactional 
+    public ProdutoResponse alterarProduto(Long usuarioId, Long id, ProdutoRequest request) {
+
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+        
         Produto produto = buscarProduto(id);
         Categoria categoria = categoriaService.buscarCategoria(request.categoriaId());
 
@@ -66,10 +78,12 @@ public class ProdutoService {
         produto.setQtdEstoque(request.qtdEstoque());
         produto.setCategoria(categoria);
         produtoRepository.save(produto);
+        
         return toDTO(produto);
     }
 
-    public ProdutoResponse statusProduto(Long id){
+    @Transactional 
+    public ProdutoResponse statusProduto(Long usuarioId, Long id){
         Produto produto = buscarProduto(id);
         if (produto.isAtivo()){
             produto.setAtivo(false);
@@ -77,12 +91,15 @@ public class ProdutoService {
         produto.setAtivo(true);
         }
         produtoRepository.save(produto);
+        contextoAuditoriaService.definirUsuarioResponsavel(id);
         return toDTO(produto);
         
     }
 
-    public void deletarProduto(Long id){
+    @Transactional
+    public void deletarProduto(Long usuarioId, Long id){
         Produto produto = buscarProduto(id);
         produtoRepository.delete(produto);
+        contextoAuditoriaService.definirUsuarioResponsavel(id);
     }
 }

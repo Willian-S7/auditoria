@@ -22,22 +22,28 @@ import com.wil.auditoria.repository.UsuarioRepository;
 public class UsuarioServiceTest {
     @Mock 
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private ContextoAuditoriaService contextoAuditoriaService;
+
     @InjectMocks
     private UsuarioService usuarioService;
 
     @Test 
     void criarUsuarioTest (){
+        Long usuarioId = 6L;
         UsuarioRequest request = new UsuarioRequest(1L,"João","2L");
         
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(usu -> usu.getArgument(0));
 
-        UsuarioResponse usuario = usuarioService.novoUsuario(request);
+        UsuarioResponse usuario = usuarioService.novoUsuario(usuarioId, request);
 
         assertEquals("João", usuario.nome());
     }
 
     @Test
     void alterarUsuarioTest() {
+        Long usuarioId = 6L;
         Long id = 1L;
         UsuarioRequest request = new UsuarioRequest(1L, "Pedro", "2L");
         Usuario usuario = new Usuario();
@@ -46,13 +52,14 @@ public class UsuarioServiceTest {
 
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(usu -> usu.getArgument(0));
 
-        UsuarioResponse response = usuarioService.alterarUsuario(id, request);
+        UsuarioResponse response = usuarioService.alterarUsuario(usuarioId, id, request);
 
         assertEquals("Pedro", response.nome());
     }
 
     @Test
     void alterarStatusTest(){
+        Long usuarioId = 6L;
         Long id = 1L;
         Usuario usuario = new Usuario();
         usuario.setAtivo(true);
@@ -60,7 +67,7 @@ public class UsuarioServiceTest {
 
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(usu -> usu.getArgument(0));
         
-        UsuarioResponse response = usuarioService.statusUsuario(id);
+        UsuarioResponse response = usuarioService.statusUsuario(usuarioId, id);
 
         assertFalse(response.ativo());
     }

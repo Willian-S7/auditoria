@@ -26,6 +26,9 @@ public class ProdutoServiceTest {
     private ProdutoRepository produtoRepository;
 
     @Mock
+    private ContextoAuditoriaService contextoAuditoriaService;
+
+    @Mock
     private CategoriaService categoriaService;
 
     @InjectMocks
@@ -33,6 +36,7 @@ public class ProdutoServiceTest {
 
     @Test 
     void criarProdutoTest() {
+        Long usuarioId = 6L;
         ProdutoRequest request = new ProdutoRequest(1L,"telefone", "descricao", new BigDecimal(10.0), 10, 5L);
         Categoria categoria = new Categoria();
         categoria.setId(1L);
@@ -43,13 +47,14 @@ public class ProdutoServiceTest {
 
         when(produtoRepository.save(any(Produto.class))).thenAnswer(usu -> usu.getArgument(0));
 
-        ProdutoResponse response = produtoService.novoProduto(request);
+        ProdutoResponse response = produtoService.novoProduto(usuarioId, request);
 
         assertEquals("telefone", response.nome());
     }
 
     @Test
     void alterarProduto() {
+        Long usuarioId = 6L;
         Long id = 1L;
         ProdutoRequest request = new ProdutoRequest(2L, "lucas", "descri", new BigDecimal(12), 20, 5L);
         Produto produto = new Produto();
@@ -66,7 +71,7 @@ public class ProdutoServiceTest {
 
         when(produtoRepository.save(any(Produto.class))).thenAnswer(prod -> prod.getArgument(0));
 
-        ProdutoResponse response = produtoService.alterarProduto(id, request);
+        ProdutoResponse response = produtoService.alterarProduto(usuarioId, id, request);
 
         assertEquals("lucas", response.nome());
     }

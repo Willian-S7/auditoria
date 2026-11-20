@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +28,8 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaResponse> novaCategoria(@RequestBody CategoriaRequest request) {
-        CategoriaResponse categoria = categoriaService.novaCategoria(request);
+    public ResponseEntity<CategoriaResponse> novaCategoria(@RequestHeader("X-usuario-Id") Long usuarioId, @RequestBody CategoriaRequest request) {
+        CategoriaResponse categoria = categoriaService.novaCategoria(usuarioId, request);
         return ResponseEntity.ok(categoria);
     }
 
@@ -45,14 +46,14 @@ public class CategoriaController {
     }
 
     @PatchMapping ("/{id}")
-    public ResponseEntity<CategoriaResponse> alterarStatusCategoria(@PathVariable Long id) {
-        CategoriaResponse categoria = categoriaService.statusCategoria(id);
+    public ResponseEntity<CategoriaResponse> alterarStatusCategoria(@RequestHeader("X-usuario-Id")  Long usuarioId, @PathVariable Long id) {
+        CategoriaResponse categoria = categoriaService.statusCategoria(usuarioId, id);
         return ResponseEntity.ok(categoria);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarCategoria (@PathVariable Long id) {
-        categoriaService.deleteCategoria(id);
+    public ResponseEntity<Void> deletarCategoria (@RequestHeader("X-usuario-Id")  Long usuarioId, @PathVariable Long id) {
+        categoriaService.deleteCategoria(usuarioId, id);
         return ResponseEntity.noContent().build();
     }
 

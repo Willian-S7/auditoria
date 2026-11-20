@@ -11,13 +11,17 @@ import com.wil.auditoria.dto.response.UsuarioResponse;
 import com.wil.auditoria.model.Usuario;
 import com.wil.auditoria.repository.UsuarioRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service 
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final ContextoAuditoriaService contextoAuditoriaService;
 
-    public UsuarioService (UsuarioRepository usuarioRepository) {
+    public UsuarioService (UsuarioRepository usuarioRepository, ContextoAuditoriaService contextoAuditoriaService) {
         this.usuarioRepository = usuarioRepository;
+        this.contextoAuditoriaService = contextoAuditoriaService;
     }
 
     public UsuarioResponse toDTO (Usuario usuario) {
@@ -27,7 +31,11 @@ public class UsuarioService {
         return response;
     }
 
-    public UsuarioResponse novoUsuario (UsuarioRequest request) {
+    @Transactional 
+    public UsuarioResponse novoUsuario (Long usuarioId, UsuarioRequest request) {
+
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+        
         Usuario usuario = new Usuario();
         usuario.setNome(request.nome());
         usuario.setLogin(request.login());
@@ -50,7 +58,11 @@ public class UsuarioService {
         return toDTO(usuario);
     }
 
-    public UsuarioResponse alterarUsuario (Long id, UsuarioRequest request) {
+    @Transactional 
+    public UsuarioResponse alterarUsuario (Long usuarioId, Long id, UsuarioRequest request) {
+
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId);
+
         Usuario usuario = buscarUsuario(id);
         usuario.setNome(request.nome());
         usuario.setLogin(request.login());
@@ -58,17 +70,24 @@ public class UsuarioService {
         return toDTO(usuario);
     }
 
-    public UsuarioResponse statusUsuario(Long id) {
+    @Transactional
+    public UsuarioResponse statusUsuario(Long usuarioId, Long id) {
+        contextoAuditoriaService.definirUsuarioResponsavel(id);
+        
         Usuario usuario = buscarUsuario(id);
 
         usuario.setAtivo(!usuario.isAtivo());
-        
         usuarioRepository.save(usuario);
         return toDTO(usuario);
     }
 
-    public void deleteUsuario (Long id) {
+    @Transactional
+    public void deleteUsuario (Long usuarioId, Long id) {
+
+        contextoAuditoriaService.definirUsuarioResponsavel(usuarioId); 
+
         Usuario usuario = buscarUsuario(id);
         usuarioRepository.delete(usuario);
+        
     }
 }
